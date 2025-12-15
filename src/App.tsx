@@ -12,9 +12,14 @@ const DEFAULT_ADJUSTMENTS: Adjustments = {
 };
 
 const DEFAULT_PATTERN: PatternOptions = {
-  scale: 1,
-  stroke: 2,
+  scale: 0.8,
+  stroke: 1.5,
   rotation: 45
+};
+
+const DEFAULT_COLORS = {
+  pattern: "#0f172a",
+  background: "#ffffff"
 };
 
 function formatValue(value: number) {
@@ -31,12 +36,19 @@ export default function App() {
   const [patternSide, setPatternSide] = useState<PatternSide>("dark");
   const [patternOptions, setPatternOptions] =
     useState<PatternOptions>(DEFAULT_PATTERN);
+  const [invertColors, setInvertColors] = useState(false);
+  const [patternColor, setPatternColor] = useState<string>(DEFAULT_COLORS.pattern);
+  const [backgroundColor, setBackgroundColor] = useState<string>(
+    DEFAULT_COLORS.background
+  );
   const [status, setStatus] = useState<string>("Load an image to begin");
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
+  const effectivePatternColor = invertColors ? backgroundColor : patternColor;
+  const effectiveBackgroundColor = invertColors ? patternColor : backgroundColor;
   const pattern = useMemo(
-    () => createPattern(patternType, patternOptions, "#0f172a"),
-    [patternOptions, patternType]
+    () => createPattern(patternType, patternOptions, effectivePatternColor),
+    [patternOptions, patternType, effectivePatternColor]
   );
 
   const handleFile = useCallback(async (file: File) => {
@@ -61,6 +73,9 @@ export default function App() {
     setPatternOptions(DEFAULT_PATTERN);
     setPatternType("dots");
     setPatternSide("dark");
+    setPatternColor(DEFAULT_COLORS.pattern);
+    setBackgroundColor(DEFAULT_COLORS.background);
+    setInvertColors(false);
   }, []);
 
   const downloadImage = useCallback(() => {
@@ -97,20 +112,28 @@ export default function App() {
 
     canvas.width = width;
     canvas.height = height;
-    ctx.fillStyle = patternSide === "dark" ? "#ffffff" : "#0f172a";
+    ctx.fillStyle = effectiveBackgroundColor;
     ctx.fillRect(0, 0, width, height);
 
     if (pattern) {
       paintPatternMasked(ctx, pattern, maskCanvas);
     } else {
       ctx.save();
-      ctx.fillStyle = patternSide === "dark" ? "#0f172a" : "#ffffff";
+      ctx.fillStyle = effectivePatternColor;
       ctx.drawImage(maskCanvas, 0, 0);
       ctx.globalCompositeOperation = "source-in";
       ctx.fillRect(0, 0, width, height);
       ctx.restore();
     }
-  }, [adjustments, bitmap, pattern, patternSide]);
+  }, [
+    adjustments,
+    bitmap,
+    effectiveBackgroundColor,
+    effectivePatternColor,
+    invertColors,
+    pattern,
+    patternSide
+  ]);
 
   return (
     <div className="app-shell">
@@ -173,18 +196,55 @@ export default function App() {
           />
 
           <h2>Pattern</h2>
-          <div className="option-group">
-            {(["dots", "diagonal", "grid", "checker", "crosshatch"] as const).map(
-              (type) => (
-                <div
-                  key={type}
-                  className={`chip ${patternType === type ? "active" : ""}`}
-                  onClick={() => setPatternType(type)}
-                >
-                  {type}
-                </div>
-              )
-            )}
+          <div className="control">
+            <label>Pattern type</label>
+            <select
+              value={patternType}
+              onChange={(e) => setPatternType(e.target.value as PatternType)}
+            >
+              <option value="dots">Dots</option>
+              <option value="diagonal">Diagonal lines</option>
+              <option value="grid">Grid</option>
+              <option value="checker">Checkers</option>
+              <option value="crosshatch">Crosshatch</option>
+            </select>
+          </div>
+          <div className="control">
+            <label>
+              <span>Pattern color</span>
+              <input
+                type="color"
+                value={patternColor}
+                onChange={(e) => setPatternColor(e.target.value)}
+                aria-label="Pattern color"
+                style={{ width: 48, height: 28, padding: 0, border: "1px solid #cbd2d9" }}
+              />
+            </label>
+          </div>
+          <div className="control">
+            <label>
+              <span>Background color</span>
+              <input
+                type="color"
+                value={backgroundColor}
+                onChange={(e) => setBackgroundColor(e.target.value)}
+                aria-label="Background color"
+                style={{ width: 48, height: 28, padding: 0, border: "1px solid #cbd2d9" }}
+              />
+            </label>
+          </div>
+          <div className="control">
+            <label>
+              <span>Invert colors</span>
+            </label>
+            <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <input
+                type="checkbox"
+                checked={invertColors}
+                onChange={(e) => setInvertColors(e.target.checked)}
+              />
+              <span className="hint">Swap pattern & background colors</span>
+            </label>
           </div>
 
           <div className="button-row">
@@ -245,7 +305,10 @@ export default function App() {
 
       <div className="panel preview-wrapper">
         <h2>Preview</h2>
-        <div className="canvas-frame">
+        <div
+          className="canvas-frame"
+          style={{ background: effectiveBackgroundColor }}
+        >
           <canvas ref={canvasRef} />
         </div>
         {!bitmap && (

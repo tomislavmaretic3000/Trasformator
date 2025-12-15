@@ -68,7 +68,7 @@ body {
 }
 
 input[type="range"] {
-  accent-color: #2563eb;
+  accent-color: #0d9488;
 }
 
 input[type="file"] {
@@ -92,13 +92,13 @@ button {
 }
 
 button:hover {
-  border-color: #2563eb;
+  border-color: #0d9488;
 }
 
 button.primary {
-  background: #2563eb;
+  background: #0d9488;
   color: #fff;
-  border-color: #2563eb;
+  border-color: #0d9488;
 }
 
 .option-group {
@@ -118,9 +118,9 @@ button.primary {
 }
 
 .chip.active {
-  border-color: #2563eb;
-  background: #e7efff;
-  color: #102a56;
+  border-color: #0d9488;
+  background: #ccfbf1;
+  color: #064e3b;
 }
 
 .preview-wrapper {

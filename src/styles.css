@@ -130,6 +130,28 @@ button.primary {
   gap: 10px;
 }
 
+.drop-zone {
+  border: 2px dashed #cbd2d9;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+  justify-content: center;
+  background: #f9fafb;
+  transition:
+    border-color 120ms ease,
+    background 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.drop-zone.dragging {
+  border-color: #0d9488;
+  background: #ecfdf5;
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.2);
+}
+
 .canvas-frame {
   position: relative;
   width: 100%;

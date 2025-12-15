@@ -11,6 +11,34 @@ const DEFAULT_ADJUSTMENTS: Adjustments = {
   threshold: 55
 };
 
+const PRESETS: { id: string; label: string; adjustments: Adjustments }[] = [
+  {
+    id: "neutral",
+    label: "Neutral",
+    adjustments: { brightness: 0, contrast: 0, threshold: 55 }
+  },
+  {
+    id: "soft",
+    label: "Soft",
+    adjustments: { brightness: -5, contrast: 10, threshold: 45 }
+  },
+  {
+    id: "bold",
+    label: "Bold",
+    adjustments: { brightness: 5, contrast: 20, threshold: 60 }
+  },
+  {
+    id: "high-contrast",
+    label: "High contrast",
+    adjustments: { brightness: -10, contrast: 35, threshold: 65 }
+  },
+  {
+    id: "film",
+    label: "Film",
+    adjustments: { brightness: 8, contrast: 12, threshold: 50 }
+  }
+];
+
 const DEFAULT_PATTERN: PatternOptions = {
   scale: 0.8,
   stroke: 1.5,
@@ -42,6 +70,8 @@ export default function App() {
     DEFAULT_COLORS.background
   );
   const [status, setStatus] = useState<string>("Load an image to begin");
+  const [presetId, setPresetId] = useState<string>("neutral");
+  const [isDragging, setIsDragging] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const effectivePatternColor = invertColors ? backgroundColor : patternColor;
@@ -68,8 +98,56 @@ export default function App() {
     [handleFile]
   );
 
+  const onPresetChange = useCallback(
+    (event: React.ChangeEvent<HTMLSelectElement>) => {
+      if (event.target.value === "custom") {
+        setPresetId("custom");
+        return;
+      }
+      const nextPreset = PRESETS.find((preset) => preset.id === event.target.value);
+      if (!nextPreset) return;
+      setPresetId(nextPreset.id);
+      setAdjustments(nextPreset.adjustments);
+    },
+    []
+  );
+
+  const onDragOver = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "copy";
+      setIsDragging(true);
+    },
+    []
+  );
+
+  const onDragLeave = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+        setIsDragging(false);
+      }
+    },
+    []
+  );
+
+  const onDrop = useCallback(
+    async (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      setIsDragging(false);
+      const file = event.dataTransfer.files?.[0];
+      if (!file) return;
+      if (!file.type.startsWith("image/")) {
+        setStatus("Please drop an image file");
+        return;
+      }
+      await handleFile(file);
+    },
+    [handleFile]
+  );
+
   const resetControls = useCallback(() => {
     setAdjustments(DEFAULT_ADJUSTMENTS);
+    setPresetId("neutral");
     setPatternOptions(DEFAULT_PATTERN);
     setPatternType("dots");
     setPatternSide("dark");
@@ -143,29 +221,14 @@ export default function App() {
           <input type="file" accept="image/*" onChange={onFileChange} />
           <div className="control">
             <label>Presets</label>
-            <div className="button-row">
-              <button
-                onClick={() =>
-                  setAdjustments({ brightness: -5, contrast: 10, threshold: 45 })
-                }
-              >
-                Soft
-              </button>
-              <button
-                onClick={() =>
-                  setAdjustments({ brightness: 5, contrast: 20, threshold: 60 })
-                }
-              >
-                Bold
-              </button>
-              <button
-                onClick={() =>
-                  setAdjustments({ brightness: 0, contrast: 0, threshold: 55 })
-                }
-              >
-                Neutral
-              </button>
-            </div>
+            <select value={presetId} onChange={onPresetChange}>
+              {PRESETS.map((preset) => (
+                <option key={preset.id} value={preset.id}>
+                  {preset.label}
+                </option>
+              ))}
+              <option value="custom">Custom</option>
+            </select>
           </div>
           <Slider
             label="Brightness"
@@ -173,7 +236,10 @@ export default function App() {
             min={-50}
             max={50}
             onChange={(value) =>
-              setAdjustments((prev) => ({ ...prev, brightness: value }))
+              setAdjustments((prev) => {
+                setPresetId("custom");
+                return { ...prev, brightness: value };
+              })
             }
           />
           <Slider
@@ -182,7 +248,10 @@ export default function App() {
             min={-50}
             max={60}
             onChange={(value) =>
-              setAdjustments((prev) => ({ ...prev, contrast: value }))
+              setAdjustments((prev) => {
+                setPresetId("custom");
+                return { ...prev, contrast: value };
+              })
             }
           />
           <Slider
@@ -191,7 +260,10 @@ export default function App() {
             min={0}
             max={100}
             onChange={(value) =>
-              setAdjustments((prev) => ({ ...prev, threshold: value }))
+              setAdjustments((prev) => {
+                setPresetId("custom");
+                return { ...prev, threshold: value };
+              })
             }
           />
 
@@ -306,16 +378,23 @@ export default function App() {
       <div className="panel preview-wrapper">
         <h2>Preview</h2>
         <div
-          className="canvas-frame"
-          style={{ background: effectiveBackgroundColor }}
+          className={`drop-zone ${isDragging ? "dragging" : ""}`}
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
+          onDrop={onDrop}
         >
-          <canvas ref={canvasRef} />
-        </div>
-        {!bitmap && (
-          <div className="hint">
-            Drop an image or use the file picker to get started.
+          <div
+            className="canvas-frame"
+            style={{ background: effectiveBackgroundColor }}
+          >
+            <canvas ref={canvasRef} />
           </div>
-        )}
+          {!bitmap && (
+            <div className="hint">
+              Drop an image here or use the file picker to get started.
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -71,6 +71,7 @@ export default function App() {
   );
   const [status, setStatus] = useState<string>("Load an image to begin");
   const [presetId, setPresetId] = useState<string>("neutral");
+  const [zoom, setZoom] = useState<number>(100);
   const [isDragging, setIsDragging] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -154,6 +155,7 @@ export default function App() {
     setPatternColor(DEFAULT_COLORS.pattern);
     setBackgroundColor(DEFAULT_COLORS.background);
     setInvertColors(false);
+    setZoom(100);
   }, []);
 
   const downloadImage = useCallback(() => {
@@ -387,13 +389,39 @@ export default function App() {
             className="canvas-frame"
             style={{ background: effectiveBackgroundColor }}
           >
-            <canvas ref={canvasRef} />
+            <canvas
+              ref={canvasRef}
+              style={{
+                transform: `scale(${zoom / 100})`,
+                transformOrigin: "top left"
+              }}
+            />
           </div>
           {!bitmap && (
             <div className="hint">
               Drop an image here or use the file picker to get started.
             </div>
           )}
+        </div>
+        <div className="control">
+          <label>
+            <span>Zoom</span>
+            <span>{formatValue(zoom)}%</span>
+          </label>
+          <div className="button-row">
+            <button
+              type="button"
+              onClick={() => setZoom((prev) => Math.max(50, prev - 10))}
+            >
+              - Zoom out
+            </button>
+            <button
+              type="button"
+              onClick={() => setZoom((prev) => Math.min(200, prev + 10))}
+            >
+              + Zoom in
+            </button>
+          </div>
         </div>
       </div>
     </div>

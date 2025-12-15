@@ -158,7 +158,7 @@ button.primary {
   background: #e5e7eb;
   border: 1px solid #d2d6dc;
   border-radius: 12px;
-  overflow: hidden;
+  overflow: auto;
   min-height: 280px;
 }
 

@@ -14,8 +14,8 @@ export function createPattern(
   color = "#0f172a"
 ): CanvasPattern | null {
   const tile = document.createElement("canvas");
-  const baseSize = 80;
-  const size = Math.max(24, baseSize * options.scale);
+  const baseSize = 48;
+  const size = Math.max(20, baseSize * options.scale);
   tile.width = size;
   tile.height = size;
   const ctx = tile.getContext("2d");
@@ -28,10 +28,11 @@ export function createPattern(
 
   switch (type) {
     case "dots": {
-      const radius = Math.max(1, (size / 12) * options.scale);
-      const spacing = size / 3.2;
-      for (let y = spacing / 2; y < size; y += spacing) {
-        for (let x = spacing / 2; x < size; x += spacing) {
+      const radius = Math.max(0.8, (size / 18) * options.scale);
+      const spacing = size / 4;
+      for (let row = 0, y = spacing / 2; y < size; row++, y += spacing) {
+        const offset = (row * spacing) / 2; // stagger rows for 45° alignment
+        for (let x = (spacing / 2 + offset) % spacing; x < size + spacing; x += spacing) {
           ctx.beginPath();
           ctx.arc(x, y, radius, 0, Math.PI * 2);
           ctx.fill();
@@ -40,7 +41,7 @@ export function createPattern(
       break;
     }
     case "diagonal": {
-      const spacing = size / 3.2;
+      const spacing = size / 4;
       ctx.save();
       ctx.translate(size / 2, size / 2);
       ctx.rotate(toRad(options.rotation));
@@ -55,7 +56,7 @@ export function createPattern(
       break;
     }
     case "grid": {
-      const spacing = size / 4;
+      const spacing = size / 5;
       for (let i = 0; i <= size; i += spacing) {
         ctx.beginPath();
         ctx.moveTo(i, 0);
@@ -69,7 +70,7 @@ export function createPattern(
       break;
     }
     case "checker": {
-      const cells = 4;
+      const cells = 5;
       const cell = size / cells;
       for (let y = 0; y < cells; y++) {
         for (let x = 0; x < cells; x++) {
@@ -81,7 +82,7 @@ export function createPattern(
       break;
     }
     case "crosshatch": {
-      const spacing = size / 4;
+      const spacing = size / 5;
       for (let x = -size; x < size * 2; x += spacing) {
         ctx.beginPath();
         ctx.moveTo(x, 0);

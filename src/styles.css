@@ -84,7 +84,7 @@ input[type="file"] {
 button {
   border: 1px solid #cbd2d9;
   background: #fff;
-  border-radius: 8px;
+  border-radius: 9999px;
   padding: 8px 12px;
   font-weight: 600;
   cursor: pointer;

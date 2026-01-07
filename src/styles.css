@@ -1,9 +1,23 @@
 :root {
   color-scheme: light;
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
-  background: #f8f9fb;
-  color: #1f2933;
+  font-family: "Montserrat", system-ui, -apple-system, sans-serif;
   line-height: 1.5;
+
+  /* Tokens from Figma export */
+  --color-bg: #f9fafbff;
+  --color-bg-subtle: #f3f4f6ff;
+  --color-card: #ffffffff;
+  --color-surface: #020c33ff;
+  --color-surface-hover: #6270a5ff;
+  --color-border: #d1d5dbff;
+  --color-border-focus: #6270a5ff;
+  --color-text: #111928ff;
+  --color-text-subtle: #374151ff;
+  --color-text-on-dark: #ffffffff;
+  --color-primary: #16b8a5ff;
+  --color-primary-hover: #0d6d62ff;
+  --color-primary-light: #c8f8f3ff;
+  --color-icon: #6b7280ff;
 }
 
 * {
@@ -13,6 +27,8 @@
 body {
   margin: 0;
   min-height: 100vh;
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
 #root {
@@ -35,8 +51,8 @@ body {
 }
 
 .panel {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 18px 16px;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
@@ -63,7 +79,7 @@ body {
   display: flex;
   justify-content: space-between;
   font-size: 14px;
-  color: #3b4452;
+  color: var(--color-text);
   font-weight: 600;
 }
 
@@ -82,8 +98,8 @@ input[type="file"] {
 }
 
 button {
-  border: 1px solid #cbd2d9;
-  background: #fff;
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
   border-radius: 9999px;
   padding: 8px 12px;
   font-weight: 600;
@@ -92,13 +108,13 @@ button {
 }
 
 button:hover {
-  border-color: #0d9488;
+  border-color: var(--color-primary);
 }
 
 button.primary {
-  background: #0d9488;
-  color: #fff;
-  border-color: #0d9488;
+  background: var(--color-primary);
+  color: var(--color-text-on-dark);
+  border-color: var(--color-primary);
 }
 
 .option-group {
@@ -109,18 +125,18 @@ button.primary {
 
 .chip {
   padding: 8px 10px;
-  border: 1px solid #cbd2d9;
+  border: 1px solid var(--color-border);
   border-radius: 10px;
-  background: #fff;
+  background: var(--color-card);
   cursor: pointer;
   font-weight: 600;
   text-align: center;
 }
 
 .chip.active {
-  border-color: #0d9488;
-  background: #ccfbf1;
-  color: #064e3b;
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  color: var(--color-primary-hover);
 }
 
 .preview-wrapper {
@@ -131,7 +147,7 @@ button.primary {
 }
 
 .drop-zone {
-  border: 2px dashed #cbd2d9;
+  border: 2px dashed var(--color-border);
   border-radius: 12px;
   padding: 16px;
   display: flex;
@@ -139,7 +155,7 @@ button.primary {
   gap: 10px;
   align-items: stretch;
   justify-content: center;
-  background: #f9fafb;
+  background: var(--color-bg-subtle);
   transition:
     border-color 120ms ease,
     background 120ms ease,
@@ -147,16 +163,16 @@ button.primary {
 }
 
 .drop-zone.dragging {
-  border-color: #0d9488;
-  background: #ecfdf5;
-  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.2);
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  box-shadow: 0 0 0 2px rgba(22, 184, 165, 0.2);
 }
 
 .canvas-frame {
   position: relative;
   width: 100%;
-  background: #e5e7eb;
-  border: 1px solid #d2d6dc;
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   overflow: auto;
   min-height: 280px;
@@ -170,7 +186,7 @@ canvas {
 
 .hint {
   font-size: 13px;
-  color: #52616b;
+  color: var(--color-text-subtle);
 }
 
 
